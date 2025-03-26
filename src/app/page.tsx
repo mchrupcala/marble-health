@@ -1,7 +1,11 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Calendar,
+  momentLocalizer,
+  Event as RBCEvent,
+} from "react-big-calendar";
 import moment from "moment";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 
@@ -11,52 +15,109 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
+interface CalendarEvent extends RBCEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+}
+
 export default function Home() {
-  // TODO - adding event to calendar should call my POST or PUT endpoints
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
 
-  // TODO - get all events
-  // TODO - get all events (only for user's session)
-  const [events, setEvents] = useState([
-    {
-      start: new Date("2025-03-28T12:00-0500"),
-      end: new Date("2025-03-28T12:01-0500"),
-      title: "Earlier",
-    },
-    {
-      start: moment().toDate(),
-      end: moment().add(1, "days").toDate(),
-      title: "Some title",
-    },
-  ]);
+  // 🔁 Fetch events on mount
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const res = await fetch("/api/events");
+      const data = await res.json();
+      const mapped = data.map((e: any) => ({
+        id: e.id,
+        title: e.name,
+        start: e.start,
+        end: e.end, // you can customize this later
+      }));
+      console.log(mapped);
+      setEvents(mapped);
+    };
 
-  const handleSlotSelect = useCallback(({ start, end, action }) => {
+    fetchEvents();
+  }, []);
+
+  // ➕ Add event
+  const handleSlotSelect = useCallback(async ({ start, end, action }) => {
     if (action === "doubleClick") {
       const title = window.prompt("New Event name");
-
       if (!title) return;
 
-      const newEvent = { start, end, title };
-      setEvents((prevEvents) => [...prevEvents, newEvent]);
+      const body = {
+        name: title,
+        start,
+        end,
+        // ownerId: "placeholder-id"
+      }; // Replace with real user later
+
+      const res = await fetch("/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const created = await res.json();
+
+      setEvents((prev) => [
+        ...prev,
+        {
+          id: created.id,
+          title: created.name,
+          start,
+          end,
+        },
+      ]);
     }
   }, []);
 
-  const handleSelectEvent = useCallback((event) => {
-    //TODO - change this so I can edit events.
+  // 🛠 Resize event
+  const onEventResize = useCallback(async ({ event, start, end }) => {
+    const updated = {
+      id: event.id,
+      name: event.title,
+      start,
+      end,
+      // ownerId: "placeholder-id", // Replace with real user later
+    };
 
-    window.alert(event.title);
-  }, []);
-
-  // TODO - update event after a resize
-  const onEventResize = useCallback(({ start, end }) => {
-    setEvents((prevEvents) => {
-      const updated = [...prevEvents];
-      updated[0] = { ...updated[0], start, end };
-      return updated;
+    await fetch("/api/events", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated),
     });
+
+    setEvents((prev) =>
+      prev.map((e) => (e.id === event.id ? { ...e, start, end } : e))
+    );
   }, []);
 
-  const onEventDrop = useCallback((data) => {
-    console.log(data);
+  const onEventDrop = useCallback(async ({ event, start, end }) => {
+    const updated = {
+      id: event.id,
+      name: event.title,
+      start,
+      end,
+      // ownerId: "placeholder-id", // Replace with real user later
+    };
+    await fetch("/api/events", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated),
+    });
+
+    setEvents((prev) =>
+      prev.map((e) => (e.id === event.id ? { ...e, start, end } : e))
+    );
+  }, []);
+
+  const handleSelectEvent = useCallback((event) => {
+    window.alert(event.title);
   }, []);
 
   return (

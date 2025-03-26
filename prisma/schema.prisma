@@ -18,13 +18,15 @@ model User {
   createdAt DateTime @default(now())
   username  String   @unique
   password  String
-  events    Event[]
+  // events    Event[]
 }
 
 model Event {
   id          String   @id @default(uuid())
   createdAt   DateTime @default(now())
   name        String   @db.VarChar(255)
-  ownerId String
-  owner   User     @relation(fields: [ownerId], references: [id])
+  start       DateTime @default(now())
+  end         DateTime @default(now())
+  // ownerId String
+  // owner   User     @relation(fields: [ownerId], references: [id])
 }
