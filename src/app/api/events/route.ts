@@ -51,6 +51,8 @@ export async function PUT(req: Request) {
   const {
     id,
     name,
+    start,
+    end,
     // ownerId
   } = body;
 
@@ -65,6 +67,8 @@ export async function PUT(req: Request) {
     where: { id },
     data: {
       name,
+      start,
+      end,
       // ownerId
     },
   });
