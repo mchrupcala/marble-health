@@ -1,4 +1,3 @@
-// src/app/api/users/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "../../lib/prisma";
 
@@ -10,10 +9,16 @@ export async function GET() {
 export async function POST(req: Request) {
   const body = await req.json();
   const { username, password } = body;
+  let user;
 
-  const user = await prisma.user.create({
-    data: { username, password },
-  });
+  try {
+    user = await prisma.user.create({
+      data: { username, password },
+    });
+  } catch (err) {
+    console.warn(err);
+    return NextResponse.json({ error: "Error creating user" }, { status: 500 });
+  }
 
   return NextResponse.json(user, { status: 201 });
 }
