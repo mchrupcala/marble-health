@@ -1,0 +1,27 @@
+(scheduling a group therapy)
+
+// create event -- select 1+ patients from a list
+// no max here.
+// lots of edge cases, don't worrya about those for now. happy path
+
+    // everybody can access my calendar --
+
+// persist -- when an event's saved, it should persist with those users
+
+//name of a patient. don't worry about passwords/auth. nothing else
+
+//ignore my existing events -- just for future events
+
+/////
+/////
+/////
+// pseduocode
+
+// Users -- new model, create a user
+// I can create dummy users in my DB. don't worry about the routes.
+
+// getAllUsers()
+
+// include e.user in the existing POST (create new event)
+
+// ignore error handling
