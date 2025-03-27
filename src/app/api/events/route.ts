@@ -15,7 +15,6 @@ export async function POST(req: Request) {
     end,
     // ownerId
   } = body;
-  console.log("body: ", body);
 
   // if (!ownerId) {
   //   return NextResponse.json({ error: "User missing" }, { status: 404 });

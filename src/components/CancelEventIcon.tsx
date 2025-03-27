@@ -1,4 +1,4 @@
-type CustomEventProps = {
+type CancelEventIconProps = {
   event: {
     id: string;
     title: string;
@@ -6,7 +6,7 @@ type CustomEventProps = {
   onDelete: (id: string) => void;
 };
 
-export const CustomEvent = ({ event, onDelete }: CustomEventProps) => {
+export const CancelEventIcon = ({ event, onDelete }: CancelEventIconProps) => {
   return (
     <div className="relative group px-1">
       <span>{event.title}</span>

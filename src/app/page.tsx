@@ -9,7 +9,7 @@ import {
 } from "react-big-calendar";
 import moment from "moment";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
-import { CustomEvent } from "../components/CustomEvent";
+import { CancelEventIcon } from "../components/CancelEventIcon";
 
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -27,7 +27,6 @@ interface CalendarEvent extends RBCEvent {
 export default function Home() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
 
-  // 🔁 Fetch events on mount
   useEffect(() => {
     const fetchEvents = async () => {
       const res = await fetch("/api/events");
@@ -36,7 +35,7 @@ export default function Home() {
         id: e.id,
         title: e.name,
         start: e.start,
-        end: e.end, // you can customize this later
+        end: e.end,
       }));
       console.log(mapped);
       setEvents(mapped);
@@ -45,7 +44,6 @@ export default function Home() {
     fetchEvents();
   }, []);
 
-  // ➕ Add event
   const handleSlotSelect = useCallback(async ({ start, end, action }) => {
     if (action === "doubleClick") {
       const title = window.prompt("New Event name");
@@ -55,8 +53,7 @@ export default function Home() {
         name: title,
         start,
         end,
-        // ownerId: "placeholder-id"
-      }; // Replace with real user later
+      };
 
       const res = await fetch("/api/events", {
         method: "POST",
@@ -78,14 +75,12 @@ export default function Home() {
     }
   }, []);
 
-  // 🛠 Resize event
   const onEventResize = useCallback(async ({ event, start, end }) => {
     const updated = {
       id: event.id,
       name: event.title,
       start,
       end,
-      // ownerId: "placeholder-id", // Replace with real user later
     };
 
     await fetch("/api/events", {
@@ -115,7 +110,6 @@ export default function Home() {
         name: event.title,
         start: new Date(start),
         end: new Date(end),
-        // ownerId: "placeholder-id", // Replace with real user later
       };
       await fetch("/api/events", {
         method: "PUT",
@@ -160,7 +154,7 @@ export default function Home() {
         style={{ height: "100vh" }}
         components={{
           event: (props) => (
-            <CustomEvent {...props} onDelete={handleDeleteEvent} />
+            <CancelEventIcon {...props} onDelete={handleDeleteEvent} />
           ),
         }}
       />
