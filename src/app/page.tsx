@@ -100,6 +100,7 @@ export default function Home() {
         name: title,
         start,
         end,
+        username,
       };
 
       const res = await fetch("/api/events", {
